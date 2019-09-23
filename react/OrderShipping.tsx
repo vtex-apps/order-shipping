@@ -13,9 +13,11 @@ interface OrderShippingProps {
 const OrderShippingContext = createContext<Context | undefined>(undefined)
 
 export const OrderShippingProvider = ({ children }: OrderShippingProps) => {
-  const { orderForm } = useOrderForm()
-
-  const { shipping: countries } = orderForm
+  const {
+    orderForm: {
+      shipping: { countries },
+    },
+  } = useOrderForm()
 
   return (
     <OrderShippingContext.Provider value={{ countries }}>
