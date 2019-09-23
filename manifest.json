@@ -1,13 +1,11 @@
 {
   "vendor": "vtex",
-  "name": "base-store-component",
+  "name": "order-shipping",
   "version": "0.0.1",
-  "title": "IO Base Component",
-  "description": "IO Base component",
+  "title": "Order Shipping",
+  "description": "Order Shipping component",
   "defaultLocale": "pt-BR",
   "builders": {
-    "messages": "1.x",
-    "store": "0.x",
     "react": "3.x"
   },
   "mustUpdateAt": "2019-04-02",
@@ -15,6 +13,8 @@
     "postreleasy": "vtex publish --verbose"
   },
   "dependencies": {
-    "vtex.styleguide": "9.x"
-  }
+    "vtex.order-manager": "0.x",
+    "vtex.checkout-resources": "0.x"
+  },
+  "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }
