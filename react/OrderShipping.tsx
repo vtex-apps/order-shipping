@@ -17,9 +17,9 @@ import {
 
 interface Context {
   countries: string[]
-  selectedAddress: any
+  selectedAddress: CheckoutAddress
   insertAddress: any
-  deliveryOptions: any
+  deliveryOptions: DeliveryOption[]
   selectDeliveryOption: any
 }
 
@@ -99,7 +99,7 @@ export const OrderShippingProvider = compose(
     })
 
     const insertAddress = useCallback(
-      (address: any) => {
+      (address: CheckoutAddress) => {
         const task = async () => {
           const {
             data: { estimateShipping: newOrderForm },
