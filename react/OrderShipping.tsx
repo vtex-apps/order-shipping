@@ -31,16 +31,20 @@ interface OrderShippingProps {
 
 const OrderShippingContext = createContext<Context | undefined>(undefined)
 
-const shippingId = 'shipping'
+const shippingId = 'Shipping'
 
-const getNewDeliveryOptions = (
+const PENDING = 'Pending'
+const FULFILLED = 'Fulfilled'
+const TASK_CANCELLED = 'TASK_CANCELLED'
+
+const changeSelectedDeliveryOption = (
   deliveryOptions: DeliveryOption[],
-  selectedDeliveryOption: string
+  selectedDeliveryOptionId: string
 ) => {
   return deliveryOptions.map(option => {
     if (option.isSelected) {
       option.isSelected = false
-    } else if (option.id === selectedDeliveryOption) {
+    } else if (option.id === selectedDeliveryOptionId) {
       option.isSelected = true
     }
 
@@ -50,7 +54,7 @@ const getNewDeliveryOptions = (
 
 const updateShipping = (totalizers: Totalizer[], newShippingValue: number) => {
   return totalizers.map(totalizer => {
-    if (totalizer.id === 'Shipping') {
+    if (totalizer.id === shippingId) {
       totalizer.value = newShippingValue
     }
     return totalizer
@@ -59,7 +63,7 @@ const updateShipping = (totalizers: Totalizer[], newShippingValue: number) => {
 
 const getShipping = (totalizers: Totalizer[]) => {
   return totalizers.find(totalizer => {
-    return totalizer.id === 'Shipping'
+    return totalizer.id === shippingId
   })
 }
 
@@ -90,11 +94,11 @@ export const OrderShippingProvider = compose(
 
     const isQueueBusy = useRef(false)
     useEffect(() => {
-      const unlisten = listen('Pending', () => (isQueueBusy.current = true))
+      const unlisten = listen(PENDING, () => (isQueueBusy.current = true))
       return unlisten
     })
     useEffect(() => {
-      const unlisten = listen('Fulfilled', () => (isQueueBusy.current = false))
+      const unlisten = listen(FULFILLED, () => (isQueueBusy.current = false))
       return unlisten
     })
 
@@ -119,7 +123,7 @@ export const OrderShippingProvider = compose(
             }
           })
           .catch((error: any) => {
-            if (!error || error.code !== 'TASK_CANCELLED') {
+            if (!error || error.code !== TASK_CANCELLED) {
               throw error
             }
           })
@@ -145,7 +149,7 @@ export const OrderShippingProvider = compose(
           ...orderForm,
           shipping: {
             ...orderForm.shipping,
-            deliveryOptions: getNewDeliveryOptions(
+            deliveryOptions: changeSelectedDeliveryOption(
               deliveryOptions,
               deliveryOptionId
             ),
@@ -173,7 +177,7 @@ export const OrderShippingProvider = compose(
             }
           })
           .catch((error: any) => {
-            if (!error || error.code !== 'TASK_CANCELLED') {
+            if (!error || error.code !== TASK_CANCELLED) {
               throw error
             }
           })

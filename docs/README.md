@@ -6,7 +6,7 @@ Any kind of shipping query or manipulation should be made through this component
 
 ## Usage
 
-Use the function `useOrderShipping` to get access to the API methods. Your component must be contained in a `OrderShippingProvider`, which in turn must be contained in a `OrderFormProvider` inside a `OrderQueueProvider`.
+Use the hook `useOrderShipping` to get access to the API methods. Your component must be contained in a `OrderShippingProvider`, which in turn must be contained in a `OrderFormProvider` inside a `OrderQueueProvider`.
 
 ```tsx
 import { OrderFormProvider } from 'vtex.order-manager/OrderForm'
