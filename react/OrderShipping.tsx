@@ -18,9 +18,9 @@ import {
 interface Context {
   countries: string[]
   selectedAddress: CheckoutAddress
-  insertAddress: any
+  insertAddress: (address: CheckoutAddress) => void
   deliveryOptions: DeliveryOption[]
-  selectDeliveryOption: any
+  selectDeliveryOption: (option: string) => void
 }
 
 interface OrderShippingProps {
