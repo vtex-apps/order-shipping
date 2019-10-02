@@ -96,11 +96,11 @@ export const OrderShippingProvider = compose(
     useEffect(() => {
       const unlisten = listen(PENDING, () => (isQueueBusy.current = true))
       return unlisten
-    })
+    }, [listen])
     useEffect(() => {
       const unlisten = listen(FULFILLED, () => (isQueueBusy.current = false))
       return unlisten
-    })
+    }, [listen])
 
     const insertAddress = useCallback(
       (address: CheckoutAddress) => {
