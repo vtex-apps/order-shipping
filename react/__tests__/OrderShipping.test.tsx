@@ -186,5 +186,7 @@ describe('OrderShipping', () => {
     })
 
     await act(() => new Promise(resolve => setTimeout(() => resolve())))
+
+    expect(getByText('PAC')).toBeTruthy()
   })
 })
