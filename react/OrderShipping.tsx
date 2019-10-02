@@ -33,8 +33,11 @@ const OrderShippingContext = createContext<Context | undefined>(undefined)
 
 const shippingId = 'Shipping'
 
-const PENDING = 'Pending'
-const FULFILLED = 'Fulfilled'
+const STATUS = {
+  PENDING: 'Pending',
+  FULFILLED: 'Fulfilled',
+}
+
 const TASK_CANCELLED = 'TASK_CANCELLED'
 
 const changeSelectedDeliveryOption = (
@@ -94,11 +97,17 @@ export const OrderShippingProvider = compose(
 
     const isQueueBusy = useRef(false)
     useEffect(() => {
-      const unlisten = listen(PENDING, () => (isQueueBusy.current = true))
+      const unlisten = listen(
+        STATUS.PENDING,
+        () => (isQueueBusy.current = true)
+      )
       return unlisten
     }, [listen])
     useEffect(() => {
-      const unlisten = listen(FULFILLED, () => (isQueueBusy.current = false))
+      const unlisten = listen(
+        STATUS.FULFILLED,
+        () => (isQueueBusy.current = false)
+      )
       return unlisten
     }, [listen])
 

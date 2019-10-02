@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from 'react'
+import React, { FunctionComponent } from 'react'
 import { act, render, fireEvent } from '@vtex/test-tools/react'
 import {
   estimateShipping as EstimateShipping,
