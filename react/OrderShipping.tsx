@@ -1,13 +1,6 @@
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useCallback,
-  useEffect,
-  useRef,
-} from 'react'
+import React, { createContext, ReactNode, useContext, useCallback } from 'react'
 import { compose, graphql } from 'react-apollo'
-import { useOrderQueue } from 'vtex.order-manager/OrderQueue'
+import { useOrderQueue, useQueueStatus } from 'vtex.order-manager/OrderQueue'
 import { useOrderForm } from 'vtex.order-manager/OrderForm'
 
 import {
@@ -32,13 +25,12 @@ interface OrderShippingProps {
 const OrderShippingContext = createContext<Context | undefined>(undefined)
 
 const shippingId = 'Shipping'
+const TASK_CANCELLED = 'TASK_CANCELLED'
 
-const STATUS = {
+const QueueStatus = {
   PENDING: 'Pending',
   FULFILLED: 'Fulfilled',
 }
-
-const TASK_CANCELLED = 'TASK_CANCELLED'
 
 const changeSelectedDeliveryOption = (
   deliveryOptions: DeliveryOption[],
@@ -91,25 +83,11 @@ export const OrderShippingProvider = compose(
     const { enqueue, listen } = useOrderQueue()
     const { orderForm, setOrderForm } = useOrderForm()
 
+    const queueStatusRef = useQueueStatus(listen)
+
     const {
       shipping: { countries, selectedAddress, deliveryOptions },
     } = orderForm
-
-    const isQueueBusy = useRef(false)
-    useEffect(() => {
-      const unlisten = listen(
-        STATUS.PENDING,
-        () => (isQueueBusy.current = true)
-      )
-      return unlisten
-    }, [listen])
-    useEffect(() => {
-      const unlisten = listen(
-        STATUS.FULFILLED,
-        () => (isQueueBusy.current = false)
-      )
-      return unlisten
-    }, [listen])
 
     const insertAddress = useCallback(
       (address: CheckoutAddress) => {
@@ -127,7 +105,7 @@ export const OrderShippingProvider = compose(
 
         enqueue(task, shippingId)
           .then((newOrderForm: OrderForm) => {
-            if (!isQueueBusy.current) {
+            if (queueStatusRef.current === QueueStatus.FULFILLED) {
               setOrderForm(newOrderForm)
             }
           })
@@ -137,7 +115,7 @@ export const OrderShippingProvider = compose(
             }
           })
       },
-      [EstimateShipping, enqueue, setOrderForm]
+      [EstimateShipping, enqueue, queueStatusRef, setOrderForm]
     )
 
     const selectDeliveryOption = useCallback(
@@ -181,7 +159,7 @@ export const OrderShippingProvider = compose(
 
         enqueue(task, shippingId)
           .then((newOrderForm: OrderForm) => {
-            if (!isQueueBusy.current) {
+            if (queueStatusRef.current === QueueStatus.FULFILLED) {
               setOrderForm(newOrderForm)
             }
           })
@@ -191,7 +169,14 @@ export const OrderShippingProvider = compose(
             }
           })
       },
-      [SelectDeliveryOption, deliveryOptions, enqueue, orderForm, setOrderForm]
+      [
+        SelectDeliveryOption,
+        deliveryOptions,
+        enqueue,
+        queueStatusRef,
+        orderForm,
+        setOrderForm,
+      ]
     )
 
     return (
