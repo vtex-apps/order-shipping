@@ -1,6 +1,10 @@
 import React, { createContext, ReactNode, useContext, useCallback } from 'react'
 import { compose, graphql } from 'react-apollo'
-import { useOrderQueue, useQueueStatus } from 'vtex.order-manager/OrderQueue'
+import {
+  QueueStatus,
+  useOrderQueue,
+  useQueueStatus,
+} from 'vtex.order-manager/OrderQueue'
 import { useOrderForm } from 'vtex.order-manager/OrderForm'
 
 import {
@@ -26,11 +30,6 @@ const OrderShippingContext = createContext<Context | undefined>(undefined)
 
 const shippingId = 'Shipping'
 const TASK_CANCELLED = 'TASK_CANCELLED'
-
-const QueueStatus = {
-  PENDING: 'Pending',
-  FULFILLED: 'Fulfilled',
-}
 
 const changeSelectedDeliveryOption = (
   deliveryOptions: DeliveryOption[],
@@ -71,6 +70,32 @@ const findDeliveryOptionById = (
   })!
 }
 
+const enqueueTask = ({
+  task,
+  enqueue,
+  queueStatusRef,
+  setOrderForm,
+  taskId,
+}: {
+  task: () => Promise<any>
+  enqueue: (task: any, id?: string) => Promise<any>
+  queueStatusRef: React.MutableRefObject<QueueStatus>
+  setOrderForm: (orderForm: Partial<OrderForm>) => void
+  taskId?: string
+}) => {
+  enqueue(task, taskId)
+    .then((newOrderForm: OrderForm) => {
+      if (queueStatusRef.current === QueueStatus.FULFILLED) {
+        setOrderForm(newOrderForm)
+      }
+    })
+    .catch((error: any) => {
+      if (!error || error.code !== TASK_CANCELLED) {
+        throw error
+      }
+    })
+}
+
 export const OrderShippingProvider = compose(
   graphql(EstimateShipping, { name: 'EstimateShipping' }),
   graphql(SelectDeliveryOption, { name: 'SelectDeliveryOption' })
@@ -103,17 +128,13 @@ export const OrderShippingProvider = compose(
           return newOrderForm
         }
 
-        enqueue(task, shippingId)
-          .then((newOrderForm: OrderForm) => {
-            if (queueStatusRef.current === QueueStatus.FULFILLED) {
-              setOrderForm(newOrderForm)
-            }
-          })
-          .catch((error: any) => {
-            if (!error || error.code !== TASK_CANCELLED) {
-              throw error
-            }
-          })
+        enqueueTask({
+          task,
+          enqueue,
+          queueStatusRef,
+          setOrderForm,
+          taskId: shippingId,
+        })
       },
       [EstimateShipping, enqueue, queueStatusRef, setOrderForm]
     )
@@ -157,17 +178,13 @@ export const OrderShippingProvider = compose(
           return newOrderForm
         }
 
-        enqueue(task, shippingId)
-          .then((newOrderForm: OrderForm) => {
-            if (queueStatusRef.current === QueueStatus.FULFILLED) {
-              setOrderForm(newOrderForm)
-            }
-          })
-          .catch((error: any) => {
-            if (!error || error.code !== TASK_CANCELLED) {
-              throw error
-            }
-          })
+        enqueueTask({
+          task,
+          enqueue,
+          queueStatusRef,
+          setOrderForm,
+          taskId: shippingId,
+        })
       },
       [
         SelectDeliveryOption,
