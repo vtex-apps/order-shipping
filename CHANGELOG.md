@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.2.0] - 2019-10-10
+
 ## Added
 
 - `insertAddress` function that calls `EstimateShipping` mutation in order to get available delivery options.
