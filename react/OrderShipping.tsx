@@ -12,10 +12,14 @@ import {
   selectDeliveryOption as SelectDeliveryOption,
 } from 'vtex.checkout-resources/Mutations'
 
+interface InsertAddressResult {
+  success: boolean
+}
+
 interface Context {
   countries: string[]
   selectedAddress: CheckoutAddress
-  insertAddress: (address: CheckoutAddress) => void
+  insertAddress: (address: CheckoutAddress) => Promise<InsertAddressResult>
   deliveryOptions: DeliveryOption[]
   selectDeliveryOption: (option: string) => void
 }
@@ -70,32 +74,6 @@ const findDeliveryOptionById = (
   })!
 }
 
-const enqueueTask = ({
-  task,
-  enqueue,
-  queueStatusRef,
-  setOrderForm,
-  taskId,
-}: {
-  task: () => Promise<any>
-  enqueue: (task: any, id?: string) => Promise<any>
-  queueStatusRef: React.MutableRefObject<QueueStatus>
-  setOrderForm: (orderForm: Partial<OrderForm>) => void
-  taskId?: string
-}) => {
-  enqueue(task, taskId)
-    .then((newOrderForm: OrderForm) => {
-      if (queueStatusRef.current === QueueStatus.FULFILLED) {
-        setOrderForm(newOrderForm)
-      }
-    })
-    .catch((error: any) => {
-      if (!error || error.code !== TASK_CANCELLED) {
-        throw error
-      }
-    })
-}
-
 export const OrderShippingProvider = compose(
   graphql(EstimateShipping, { name: 'EstimateShipping' }),
   graphql(SelectDeliveryOption, { name: 'SelectDeliveryOption' })
@@ -115,7 +93,7 @@ export const OrderShippingProvider = compose(
     } = orderForm
 
     const insertAddress = useCallback(
-      (address: CheckoutAddress) => {
+      async (address: CheckoutAddress) => {
         const task = async () => {
           const {
             data: { estimateShipping: newOrderForm },
@@ -128,13 +106,20 @@ export const OrderShippingProvider = compose(
           return newOrderForm
         }
 
-        enqueueTask({
-          task,
-          enqueue,
-          queueStatusRef,
-          setOrderForm,
-          taskId: shippingId,
-        })
+        try {
+          const newOrderForm = await enqueue(task, 'insertAddress')
+
+          if (queueStatusRef.current === QueueStatus.FULFILLED) {
+            setOrderForm(newOrderForm)
+          }
+
+          return { success: true }
+        } catch (error) {
+          if (!error || error.code !== TASK_CANCELLED) {
+            throw error
+          }
+          return { success: false }
+        }
       },
       [EstimateShipping, enqueue, queueStatusRef, setOrderForm]
     )
@@ -178,13 +163,7 @@ export const OrderShippingProvider = compose(
           return newOrderForm
         }
 
-        enqueueTask({
-          task,
-          enqueue,
-          queueStatusRef,
-          setOrderForm,
-          taskId: shippingId,
-        })
+        enqueue(task, 'selectDeliveryOption')
       },
       [
         SelectDeliveryOption,
