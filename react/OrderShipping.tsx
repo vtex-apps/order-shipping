@@ -18,6 +18,7 @@ interface InsertAddressResult {
 
 interface Context {
   countries: string[]
+  canEditData: boolean
   selectedAddress: CheckoutAddress
   insertAddress: (address: CheckoutAddress) => Promise<InsertAddressResult>
   deliveryOptions: DeliveryOption[]
@@ -89,6 +90,7 @@ export const OrderShippingProvider = compose(
     const queueStatusRef = useQueueStatus(listen)
 
     const {
+      canEditData,
       shipping: { countries, selectedAddress, deliveryOptions },
     } = orderForm
 
@@ -178,6 +180,7 @@ export const OrderShippingProvider = compose(
     return (
       <OrderShippingContext.Provider
         value={{
+          canEditData,
           countries,
           selectedAddress,
           insertAddress,
