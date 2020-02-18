@@ -7,10 +7,8 @@ import {
 } from 'vtex.order-manager/OrderQueue'
 import { useOrderForm } from 'vtex.order-manager/OrderForm'
 
-import {
-  estimateShipping as EstimateShipping,
-  selectDeliveryOption as SelectDeliveryOption,
-} from 'vtex.checkout-resources/Mutations'
+import EstimateShipping from 'vtex.checkout-resources/MutationEstimateShipping'
+import SelectDeliveryOption from 'vtex.checkout-resources/MutationSelectDeliveryOption'
 
 interface InsertAddressResult {
   success: boolean

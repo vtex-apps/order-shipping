@@ -1,9 +1,7 @@
 import React, { FunctionComponent } from 'react'
 import { act, render, fireEvent } from '@vtex/test-tools/react'
-import {
-  estimateShipping as EstimateShipping,
-  selectDeliveryOption as SelectDeliveryOption,
-} from 'vtex.checkout-resources/Mutations'
+import EstimateShipping from 'vtex.checkout-resources/MutationEstimateShipping'
+import SelectDeliveryOption from 'vtex.checkout-resources/MutationSelectDeliveryOption'
 import { OrderFormProvider, useOrderForm } from 'vtex.order-manager/OrderForm'
 import { OrderQueueProvider } from 'vtex.order-manager/OrderQueue'
 
