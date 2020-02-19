@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 
-export const estimateShipping = gql`
+export default gql`
   mutation MockMutation($addressInput: Address) {
     estimateShipping(addressInput: $addressInput) {
       shipping {
@@ -17,20 +17,6 @@ export const estimateShipping = gql`
           reference
           state
           street
-        }
-      }
-    }
-  }
-`
-export const selectDeliveryOption = gql`
-  mutation MockMutation($deliveryOptionId: String) {
-    selectDeliveryOption(deliveryOptionId: $deliveryOptionId) {
-      shipping {
-        deliveryOptions {
-          id
-          price
-          estimate
-          isSelected
         }
       }
     }
