@@ -21,12 +21,10 @@
     "@types/react": "^16.8.10",
     "@types/react-intl": "^2.3.17",
     "@vtex/test-tools": "^1.1.0",
-    "apollo-client": "^2.5.1",
-    "eslint": "^5.16.0",
-    "eslint-config-vtex-react": "^4.1.0",
-    "prettier": "^1.18.2",
-    "tslint-eslint-rules": "^5.4.0",
-    "typescript": "3.7.3"
+    "typescript": "3.7.3",
+    "vtex.checkout-resources": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-resources@0.26.0/public/@types/vtex.checkout-resources",
+    "vtex.order-manager": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.8.4/public/@types/vtex.order-manager",
+    "vtex.render-runtime": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.98.0/public/@types/vtex.render-runtime"
   },
   "version": "0.3.1"
 }

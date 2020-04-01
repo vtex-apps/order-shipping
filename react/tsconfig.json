@@ -4,25 +4,18 @@
     "esModuleInterop": true,
     "jsx": "react",
     "lib": ["es2017", "dom", "es2018.promise"],
-    "module": "es6",
+    "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "target": "es2017",
-    "typeRoots": ["node_modules/@types"],
-    "types": ["node", "jest", "graphql"]
+    "typeRoots": ["node_modules/@types"]
   },
-  "exclude": ["node_modules"],
-  "include": ["./typings/*.d.ts", "./**/*.tsx", "./**/*.ts"],
-  "typeAcquisition": {
-    "enable": false
-  }
+  "include": ["./typings/*.d.ts", "./**/*.tsx", "./**/*.ts"]
 }
