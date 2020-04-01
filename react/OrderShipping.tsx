@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useCallback } from 'react'
+import React, { createContext, useContext, useCallback, useMemo } from 'react'
 import { useMutation } from 'react-apollo'
 import { OrderQueue, OrderForm } from 'vtex.order-manager'
 import EstimateShippingMutation from 'vtex.checkout-resources/MutationEstimateShipping'
@@ -66,8 +66,8 @@ const findDeliveryOptionById = (
 }
 
 export const OrderShippingProvider: React.FC = ({ children }) => {
-  const [EstimateShipping] = useMutation(EstimateShippingMutation)
-  const [SelectDeliveryOption] = useMutation(SelectDeliveryOptionMutation)
+  const [estimateShipping] = useMutation(EstimateShippingMutation)
+  const [selectDeliveryOption] = useMutation(SelectDeliveryOptionMutation)
 
   const { enqueue, listen } = useOrderQueue()
   const { orderForm, setOrderForm } = useOrderForm()
@@ -79,12 +79,12 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
     shipping: { countries, selectedAddress, deliveryOptions },
   } = orderForm
 
-  const insertAddress = useCallback(
+  const handleInsertAddress = useCallback(
     async (address: CheckoutAddress) => {
       const task = async () => {
         const {
           data: { estimateShipping: newOrderForm },
-        } = await EstimateShipping({
+        } = await estimateShipping({
           variables: {
             addressInput: address,
           },
@@ -108,10 +108,10 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
         return { success: false }
       }
     },
-    [EstimateShipping, enqueue, queueStatusRef, setOrderForm]
+    [estimateShipping, enqueue, queueStatusRef, setOrderForm]
   )
 
-  const selectDeliveryOption = useCallback(
+  const handleSelectDeliveryOption = useCallback(
     (deliveryOptionId: string) => {
       const { price } = findDeliveryOptionById(
         deliveryOptions,
@@ -141,7 +141,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
       const task = async () => {
         const {
           data: { selectDeliveryOption: updatedOrderForm },
-        } = await SelectDeliveryOption({
+        } = await selectDeliveryOption({
           variables: {
             deliveryOptionId,
           },
@@ -152,20 +152,30 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
 
       enqueue(task, 'selectDeliveryOption')
     },
-    [SelectDeliveryOption, deliveryOptions, enqueue, orderForm, setOrderForm]
+    [selectDeliveryOption, deliveryOptions, enqueue, orderForm, setOrderForm]
+  )
+
+  const contextValue = useMemo(
+    () => ({
+      canEditData,
+      countries,
+      selectedAddress,
+      insertAddress: handleInsertAddress,
+      deliveryOptions,
+      selectDeliveryOption: handleSelectDeliveryOption,
+    }),
+    [
+      canEditData,
+      countries,
+      selectedAddress,
+      handleInsertAddress,
+      deliveryOptions,
+      handleSelectDeliveryOption,
+    ]
   )
 
   return (
-    <OrderShippingContext.Provider
-      value={{
-        canEditData,
-        countries,
-        selectedAddress,
-        insertAddress,
-        deliveryOptions,
-        selectDeliveryOption,
-      }}
-    >
+    <OrderShippingContext.Provider value={contextValue}>
       {children}
     </OrderShippingContext.Provider>
   )
