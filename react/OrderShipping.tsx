@@ -13,6 +13,10 @@ interface InsertAddressResult {
   success: boolean
 }
 
+interface SelectDeliveryOptionResult {
+  success: boolean
+}
+
 interface SelectAddressResult {
   success: boolean
 }
@@ -24,52 +28,12 @@ interface Context {
   selectAddress: (addressId: string) => Promise<SelectAddressResult>
   insertAddress: (address: CheckoutAddress) => Promise<InsertAddressResult>
   deliveryOptions: DeliveryOption[]
-  selectDeliveryOption: (option: string) => void
+  selectDeliveryOption: (option: string) => Promise<SelectDeliveryOptionResult>
 }
 
 const OrderShippingContext = createContext<Context | undefined>(undefined)
 
-const shippingId = 'Shipping'
 const TASK_CANCELLED = 'TASK_CANCELLED'
-
-const changeSelectedDeliveryOption = (
-  deliveryOptions: DeliveryOption[],
-  selectedDeliveryOptionId: string
-) => {
-  return deliveryOptions.map(option => {
-    if (option.isSelected) {
-      option.isSelected = false
-    } else if (option.id === selectedDeliveryOptionId) {
-      option.isSelected = true
-    }
-
-    return option
-  })
-}
-
-const updateShipping = (totalizers: Totalizer[], newShippingValue: number) => {
-  return totalizers.map(totalizer => {
-    if (totalizer.id === shippingId) {
-      totalizer.value = newShippingValue
-    }
-    return totalizer
-  })
-}
-
-const getShipping = (totalizers: Totalizer[]) => {
-  return totalizers.find(totalizer => {
-    return totalizer.id === shippingId
-  })
-}
-
-const findDeliveryOptionById = (
-  deliveryOptions: DeliveryOption[],
-  deliveryOptionId: string
-): DeliveryOption => {
-  return deliveryOptions.find(option => {
-    return option.id === deliveryOptionId
-  })!
-}
 
 export const OrderShippingProvider: React.FC = ({ children }) => {
   const [estimateShipping] = useMutation(EstimateShippingMutation)
@@ -119,32 +83,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
   )
 
   const handleSelectDeliveryOption = useCallback(
-    (deliveryOptionId: string) => {
-      const { price } = findDeliveryOptionById(
-        deliveryOptions,
-        deliveryOptionId
-      )
-
-      const shipping = getShipping(orderForm.totalizers)
-      if (!shipping) {
-        throw new Error('Shipping totalizer not found')
-      }
-
-      const oldShippingPrice = shipping.value
-
-      const newOrderForm = {
-        ...orderForm,
-        shipping: {
-          ...orderForm.shipping,
-          deliveryOptions: changeSelectedDeliveryOption(
-            deliveryOptions,
-            deliveryOptionId
-          ),
-        },
-        totalizers: updateShipping(orderForm.totalizers, price),
-        value: orderForm.value - oldShippingPrice + price,
-      }
-      setOrderForm(newOrderForm)
+    async (deliveryOptionId: string) => {
       const task = async () => {
         const {
           data: { selectDeliveryOption: updatedOrderForm },
@@ -157,9 +96,22 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
         return updatedOrderForm
       }
 
-      enqueue(task, 'selectDeliveryOption')
+      try {
+        const newOrderForm = await enqueue(task, 'selectDeliveryOption')
+
+        if (queueStatusRef.current === QueueStatus.FULFILLED) {
+          setOrderForm(newOrderForm)
+        }
+
+        return { success: true }
+      } catch (err) {
+        if (!err || err.code !== TASK_CANCELLED) {
+          throw err
+        }
+        return { success: false }
+      }
     },
-    [selectDeliveryOption, deliveryOptions, enqueue, orderForm, setOrderForm]
+    [queueStatusRef, selectDeliveryOption, enqueue, setOrderForm]
   )
 
   const handleSelectAddress = useCallback(
