@@ -3,7 +3,7 @@ import { useMutation } from 'react-apollo'
 import { OrderQueue, OrderForm } from 'vtex.order-manager'
 import EstimateShippingMutation from 'vtex.checkout-resources/MutationEstimateShipping'
 import SelectDeliveryOptionMutation from 'vtex.checkout-resources/MutationSelectDeliveryOption'
-import SelectAddressMutation from 'vtex.checkout-resources/MutationSelectAddress'
+import UpdateSelectedAddressMutation from 'vtex.checkout-resources/MutationUpdateSelectedAddress'
 
 const { QueueStatus, useOrderQueue, useQueueStatus } = OrderQueue
 
@@ -25,7 +25,9 @@ interface Context {
   countries: string[]
   canEditData: boolean
   selectedAddress: CheckoutAddress
-  selectAddress: (addressId: string) => Promise<SelectAddressResult>
+  updateSelectedAddress: (
+    address: CheckoutAddress
+  ) => Promise<SelectAddressResult>
   insertAddress: (address: CheckoutAddress) => Promise<InsertAddressResult>
   deliveryOptions: DeliveryOption[]
   selectDeliveryOption: (option: string) => Promise<SelectDeliveryOptionResult>
@@ -38,7 +40,7 @@ const TASK_CANCELLED = 'TASK_CANCELLED'
 export const OrderShippingProvider: React.FC = ({ children }) => {
   const [estimateShipping] = useMutation(EstimateShippingMutation)
   const [selectDeliveryOption] = useMutation(SelectDeliveryOptionMutation)
-  const [selectAddress] = useMutation(SelectAddressMutation)
+  const [updateSelectedAddress] = useMutation(UpdateSelectedAddressMutation)
 
   const { enqueue, listen } = useOrderQueue()
   const { orderForm, setOrderForm } = useOrderForm()
@@ -115,15 +117,13 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
   )
 
   const handleSelectAddress = useCallback(
-    async (addressId: string) => {
+    async (address: CheckoutAddress) => {
       const task = async () => {
         const {
-          data: { selectAddress: newOrderForm },
-        } = await selectAddress({
+          data: { updateSelectedAddress: newOrderForm },
+        } = await updateSelectedAddress({
           variables: {
-            address: {
-              addressId,
-            },
+            address,
           },
         })
 
@@ -145,7 +145,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
         return { success: false }
       }
     },
-    [enqueue, queueStatusRef, selectAddress, setOrderForm]
+    [enqueue, queueStatusRef, updateSelectedAddress, setOrderForm]
   )
 
   const contextValue = useMemo(
@@ -153,7 +153,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
       canEditData,
       countries,
       selectedAddress,
-      selectAddress: handleSelectAddress,
+      updateSelectedAddress: handleSelectAddress,
       insertAddress: handleInsertAddress,
       deliveryOptions,
       selectDeliveryOption: handleSelectDeliveryOption,

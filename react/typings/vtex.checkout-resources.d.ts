@@ -6,6 +6,6 @@ declare module 'vtex.checkout-resources/MutationSelectDeliveryOption' {
   export { default } from 'vtex.checkout-resources/react/MutationSelectDeliveryOption'
 }
 
-declare module 'vtex.checkout-resources/MutationSelectAddress' {
-  export { default } from 'vtex.checkout-resources/react/MutationSelectAddress'
+declare module 'vtex.checkout-resources/MutationUpdateSelectedAddress' {
+  export { default } from 'vtex.checkout-resources/react/MutationUpdateSelectedAddress'
 }
