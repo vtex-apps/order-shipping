@@ -23,9 +23,9 @@
     "@vtex/test-tools": "^3.1.0",
     "react-intl": "^4.3.1",
     "typescript": "3.8.3",
-    "vtex.checkout-resources": "https://lucas--checkoutio.myvtex.com/_v/private/typings/linked/v1/vtex.checkout-resources@0.25.0+build1585939057/public/@types/vtex.checkout-resources",
+    "vtex.checkout-resources": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-resources@0.27.0/public/@types/vtex.checkout-resources",
     "vtex.order-manager": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.8.4/public/@types/vtex.order-manager",
-    "vtex.render-runtime": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.98.1/public/@types/vtex.render-runtime"
+    "vtex.render-runtime": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.99.0/public/@types/vtex.render-runtime"
   },
   "version": "0.3.1"
 }

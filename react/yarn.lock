@@ -5379,17 +5379,17 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-"vtex.checkout-resources@https://lucas--checkoutio.myvtex.com/_v/private/typings/linked/v1/vtex.checkout-resources@0.25.0+build1585939057/public/@types/vtex.checkout-resources":
-  version "0.25.0"
-  resolved "https://lucas--checkoutio.myvtex.com/_v/private/typings/linked/v1/vtex.checkout-resources@0.25.0+build1585939057/public/@types/vtex.checkout-resources#70b495b7dcdcacd4b6a14f4aa1fc1ae89fbf97e5"
+"vtex.checkout-resources@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-resources@0.27.0/public/@types/vtex.checkout-resources":
+  version "0.27.0"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-resources@0.27.0/public/@types/vtex.checkout-resources#3dd63269b39fd7580d11b56a27adf8c666df7a97"
 
 "vtex.order-manager@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.8.4/public/@types/vtex.order-manager":
   version "0.8.4"
   resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.8.4/public/@types/vtex.order-manager#3a4761c73364853954dd61a61d1d01260cbbf634"
 
-"vtex.render-runtime@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.98.1/public/@types/vtex.render-runtime":
-  version "8.98.1"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.98.1/public/@types/vtex.render-runtime#cb50ca11478f06b1895b328688299196da69b0fa"
+"vtex.render-runtime@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.99.0/public/@types/vtex.render-runtime":
+  version "8.99.0"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.99.0/public/@types/vtex.render-runtime#2b514299e4afe4cb940de52278ff4c67525d4985"
 
 w3c-hr-time@^1.0.1:
   version "1.0.1"
