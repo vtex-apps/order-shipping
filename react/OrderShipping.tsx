@@ -73,7 +73,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
           setOrderForm(newOrderForm)
         }
 
-        return { success: true }
+        return { success: true, orderForm: newOrderForm }
       } catch (error) {
         if (!error || error.code !== TASK_CANCELLED) {
           throw error
@@ -105,7 +105,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
           setOrderForm(newOrderForm)
         }
 
-        return { success: true }
+        return { success: true, orderForm: newOrderForm }
       } catch (err) {
         if (!err || err.code !== TASK_CANCELLED) {
           throw err
@@ -137,7 +137,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
           setOrderForm(newOrderForm)
         }
 
-        return { success: true }
+        return { success: true, orderForm: newOrderForm }
       } catch (error) {
         if (!error || error.code !== TASK_CANCELLED) {
           throw error
