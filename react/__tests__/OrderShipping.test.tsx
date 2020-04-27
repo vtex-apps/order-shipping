@@ -2,11 +2,13 @@ import React, { FunctionComponent } from 'react'
 import { act, render, fireEvent } from '@vtex/test-tools/react'
 import EstimateShipping from 'vtex.checkout-resources/MutationEstimateShipping'
 import SelectDeliveryOption from 'vtex.checkout-resources/MutationSelectDeliveryOption'
-import { OrderFormProvider, useOrderForm } from 'vtex.order-manager/OrderForm'
-import { OrderQueueProvider } from 'vtex.order-manager/OrderQueue'
+import { OrderForm, OrderQueue } from 'vtex.order-manager'
 
-import { mockOrderForm } from '../__mocks__/mockOrderForm'
+import { mockOrderForm } from '../__fixtures__/orderForm'
 import { OrderShippingProvider, useOrderShipping } from '../OrderShipping'
+
+const { OrderFormProvider, useOrderForm } = OrderForm
+const { OrderQueueProvider } = OrderQueue
 
 const mockedAddress = {
   addressId: '1569522356558',

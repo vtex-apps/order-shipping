@@ -1,16 +1,23 @@
-import React, { createContext, ReactNode, useContext, useCallback } from 'react'
-import { compose, graphql } from 'react-apollo'
-import {
-  QueueStatus,
-  useOrderQueue,
-  useQueueStatus,
-} from 'vtex.order-manager/OrderQueue'
-import { useOrderForm } from 'vtex.order-manager/OrderForm'
+import React, { createContext, useContext, useCallback, useMemo } from 'react'
+import { useMutation } from 'react-apollo'
+import { OrderQueue, OrderForm } from 'vtex.order-manager'
+import EstimateShippingMutation from 'vtex.checkout-resources/MutationEstimateShipping'
+import SelectDeliveryOptionMutation from 'vtex.checkout-resources/MutationSelectDeliveryOption'
+import UpdateSelectedAddressMutation from 'vtex.checkout-resources/MutationUpdateSelectedAddress'
 
-import EstimateShipping from 'vtex.checkout-resources/MutationEstimateShipping'
-import SelectDeliveryOption from 'vtex.checkout-resources/MutationSelectDeliveryOption'
+const { QueueStatus, useOrderQueue, useQueueStatus } = OrderQueue
+
+const { useOrderForm } = OrderForm
 
 interface InsertAddressResult {
+  success: boolean
+}
+
+interface SelectDeliveryOptionResult {
+  success: boolean
+}
+
+interface SelectAddressResult {
   success: boolean
 }
 
@@ -18,179 +25,156 @@ interface Context {
   countries: string[]
   canEditData: boolean
   selectedAddress: CheckoutAddress
+  updateSelectedAddress: (
+    address: CheckoutAddress
+  ) => Promise<SelectAddressResult>
   insertAddress: (address: CheckoutAddress) => Promise<InsertAddressResult>
   deliveryOptions: DeliveryOption[]
-  selectDeliveryOption: (option: string) => void
-}
-
-interface OrderShippingProps {
-  children: ReactNode
-  EstimateShipping: any
-  SelectDeliveryOption: any
+  selectDeliveryOption: (option: string) => Promise<SelectDeliveryOptionResult>
 }
 
 const OrderShippingContext = createContext<Context | undefined>(undefined)
 
-const shippingId = 'Shipping'
 const TASK_CANCELLED = 'TASK_CANCELLED'
 
-const changeSelectedDeliveryOption = (
-  deliveryOptions: DeliveryOption[],
-  selectedDeliveryOptionId: string
-) => {
-  return deliveryOptions.map(option => {
-    if (option.isSelected) {
-      option.isSelected = false
-    } else if (option.id === selectedDeliveryOptionId) {
-      option.isSelected = true
-    }
+export const OrderShippingProvider: React.FC = ({ children }) => {
+  const [estimateShipping] = useMutation(EstimateShippingMutation)
+  const [selectDeliveryOption] = useMutation(SelectDeliveryOptionMutation)
+  const [updateSelectedAddress] = useMutation(UpdateSelectedAddressMutation)
 
-    return option
-  })
-}
+  const { enqueue, listen } = useOrderQueue()
+  const { orderForm, setOrderForm } = useOrderForm()
 
-const updateShipping = (totalizers: Totalizer[], newShippingValue: number) => {
-  return totalizers.map(totalizer => {
-    if (totalizer.id === shippingId) {
-      totalizer.value = newShippingValue
-    }
-    return totalizer
-  })
-}
+  const queueStatusRef = useQueueStatus(listen)
 
-const getShipping = (totalizers: Totalizer[]) => {
-  return totalizers.find(totalizer => {
-    return totalizer.id === shippingId
-  })
-}
+  const {
+    canEditData,
+    shipping: { countries, selectedAddress, deliveryOptions },
+  } = orderForm
 
-const findDeliveryOptionById = (
-  deliveryOptions: DeliveryOption[],
-  deliveryOptionId: string
-): DeliveryOption => {
-  return deliveryOptions.find(option => {
-    return option.id === deliveryOptionId
-  })!
-}
-
-export const OrderShippingProvider = compose(
-  graphql(EstimateShipping, { name: 'EstimateShipping' }),
-  graphql(SelectDeliveryOption, { name: 'SelectDeliveryOption' })
-)(
-  ({
-    children,
-    EstimateShipping,
-    SelectDeliveryOption,
-  }: OrderShippingProps) => {
-    const { enqueue, listen } = useOrderQueue()
-    const { orderForm, setOrderForm } = useOrderForm()
-
-    const queueStatusRef = useQueueStatus(listen)
-
-    const {
-      canEditData,
-      shipping: { countries, selectedAddress, deliveryOptions },
-    } = orderForm
-
-    const insertAddress = useCallback(
-      async (address: CheckoutAddress) => {
-        const task = async () => {
-          const {
-            data: { estimateShipping: newOrderForm },
-          } = await EstimateShipping({
-            variables: {
-              addressInput: address,
-            },
-          })
-
-          return newOrderForm
-        }
-
-        try {
-          const newOrderForm = await enqueue(task, 'insertAddress')
-
-          if (queueStatusRef.current === QueueStatus.FULFILLED) {
-            setOrderForm(newOrderForm)
-          }
-
-          return { success: true }
-        } catch (error) {
-          if (!error || error.code !== TASK_CANCELLED) {
-            throw error
-          }
-          return { success: false }
-        }
-      },
-      [EstimateShipping, enqueue, queueStatusRef, setOrderForm]
-    )
-
-    const selectDeliveryOption = useCallback(
-      (deliveryOptionId: string) => {
-        const { price } = findDeliveryOptionById(
-          deliveryOptions,
-          deliveryOptionId
-        )
-
-        const shipping = getShipping(orderForm.totalizers)
-        if (!shipping) {
-          throw new Error('Shipping totalizer not found')
-        }
-
-        const oldShippingPrice = shipping.value
-
-        const newOrderForm = {
-          ...orderForm,
-          shipping: {
-            ...orderForm.shipping,
-            deliveryOptions: changeSelectedDeliveryOption(
-              deliveryOptions,
-              deliveryOptionId
-            ),
+  const handleInsertAddress = useCallback(
+    async (address: CheckoutAddress) => {
+      const task = async () => {
+        const {
+          data: { estimateShipping: newOrderForm },
+        } = await estimateShipping({
+          variables: {
+            addressInput: address,
           },
-          totalizers: updateShipping(orderForm.totalizers, price),
-          value: orderForm.value - oldShippingPrice + price,
-        }
-        setOrderForm(newOrderForm)
-        const task = async () => {
-          const {
-            data: { selectDeliveryOption: newOrderForm },
-          } = await SelectDeliveryOption({
-            variables: {
-              deliveryOptionId: deliveryOptionId,
-            },
-          })
+        })
 
-          return newOrderForm
+        return newOrderForm
+      }
+
+      try {
+        const newOrderForm = await enqueue(task, 'insertAddress')
+
+        if (queueStatusRef.current === QueueStatus.FULFILLED) {
+          setOrderForm(newOrderForm)
         }
 
-        enqueue(task, 'selectDeliveryOption')
-      },
-      [
-        SelectDeliveryOption,
-        deliveryOptions,
-        enqueue,
-        queueStatusRef,
-        orderForm,
-        setOrderForm,
-      ]
-    )
+        return { success: true, orderForm: newOrderForm }
+      } catch (error) {
+        if (!error || error.code !== TASK_CANCELLED) {
+          throw error
+        }
+        return { success: false }
+      }
+    },
+    [estimateShipping, enqueue, queueStatusRef, setOrderForm]
+  )
 
-    return (
-      <OrderShippingContext.Provider
-        value={{
-          canEditData,
-          countries,
-          selectedAddress,
-          insertAddress,
-          deliveryOptions,
-          selectDeliveryOption,
-        }}
-      >
-        {children}
-      </OrderShippingContext.Provider>
-    )
-  }
-)
+  const handleSelectDeliveryOption = useCallback(
+    async (deliveryOptionId: string) => {
+      const task = async () => {
+        const {
+          data: { selectDeliveryOption: updatedOrderForm },
+        } = await selectDeliveryOption({
+          variables: {
+            deliveryOptionId,
+          },
+        })
+
+        return updatedOrderForm
+      }
+
+      try {
+        const newOrderForm = await enqueue(task, 'selectDeliveryOption')
+
+        if (queueStatusRef.current === QueueStatus.FULFILLED) {
+          setOrderForm(newOrderForm)
+        }
+
+        return { success: true, orderForm: newOrderForm }
+      } catch (err) {
+        if (!err || err.code !== TASK_CANCELLED) {
+          throw err
+        }
+        return { success: false }
+      }
+    },
+    [queueStatusRef, selectDeliveryOption, enqueue, setOrderForm]
+  )
+
+  const handleSelectAddress = useCallback(
+    async (address: CheckoutAddress) => {
+      const task = async () => {
+        const {
+          data: { updateSelectedAddress: newOrderForm },
+        } = await updateSelectedAddress({
+          variables: {
+            address,
+          },
+        })
+
+        return newOrderForm
+      }
+
+      try {
+        const newOrderForm = await enqueue(task, 'selectAddress')
+
+        if (queueStatusRef.current === QueueStatus.FULFILLED) {
+          setOrderForm(newOrderForm)
+        }
+
+        return { success: true, orderForm: newOrderForm }
+      } catch (error) {
+        if (!error || error.code !== TASK_CANCELLED) {
+          throw error
+        }
+        return { success: false }
+      }
+    },
+    [enqueue, queueStatusRef, updateSelectedAddress, setOrderForm]
+  )
+
+  const contextValue = useMemo(
+    () => ({
+      canEditData,
+      countries,
+      selectedAddress,
+      updateSelectedAddress: handleSelectAddress,
+      insertAddress: handleInsertAddress,
+      deliveryOptions,
+      selectDeliveryOption: handleSelectDeliveryOption,
+    }),
+    [
+      canEditData,
+      countries,
+      selectedAddress,
+      handleSelectAddress,
+      handleInsertAddress,
+      deliveryOptions,
+      handleSelectDeliveryOption,
+    ]
+  )
+
+  return (
+    <OrderShippingContext.Provider value={contextValue}>
+      {children}
+    </OrderShippingContext.Provider>
+  )
+}
 
 export const useOrderShipping = () => {
   const context = useContext(OrderShippingContext)
