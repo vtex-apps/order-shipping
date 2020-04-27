@@ -163,7 +163,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
       selectedAddress: selectedAddress!,
       updateSelectedAddress: handleSelectAddress,
       insertAddress: handleInsertAddress,
-      deliveryOptions,
+      deliveryOptions: deliveryOptions as DeliveryOption[],
       selectDeliveryOption: handleSelectDeliveryOption,
     }),
     [
