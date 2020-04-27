@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useCallback, useMemo } from 'react'
 import { useMutation } from 'react-apollo'
 import { OrderQueue, OrderForm } from 'vtex.order-manager'
+import {
+  OrderForm as CheckoutOrderForm,
+  Address as CheckoutAddress,
+  DeliveryOption,
+} from 'vtex.checkout-graphql'
 import EstimateShippingMutation from 'vtex.checkout-resources/MutationEstimateShipping'
 import SelectDeliveryOptionMutation from 'vtex.checkout-resources/MutationSelectDeliveryOption'
 import UpdateSelectedAddressMutation from 'vtex.checkout-resources/MutationUpdateSelectedAddress'
@@ -11,20 +16,23 @@ const { useOrderForm } = OrderForm
 
 interface InsertAddressResult {
   success: boolean
+  orderForm?: CheckoutOrderForm
 }
 
 interface SelectDeliveryOptionResult {
   success: boolean
+  orderForm?: CheckoutOrderForm
 }
 
 interface SelectAddressResult {
   success: boolean
+  orderForm?: CheckoutOrderForm
 }
 
 interface Context {
   countries: string[]
   canEditData: boolean
-  selectedAddress: CheckoutAddress
+  selectedAddress?: CheckoutAddress
   updateSelectedAddress: (
     address: CheckoutAddress
   ) => Promise<SelectAddressResult>
@@ -73,7 +81,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
           setOrderForm(newOrderForm)
         }
 
-        return { success: true, orderForm: newOrderForm }
+        return { success: true, orderForm: newOrderForm as CheckoutOrderForm }
       } catch (error) {
         if (!error || error.code !== TASK_CANCELLED) {
           throw error
@@ -105,7 +113,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
           setOrderForm(newOrderForm)
         }
 
-        return { success: true, orderForm: newOrderForm }
+        return { success: true, orderForm: newOrderForm as CheckoutOrderForm }
       } catch (err) {
         if (!err || err.code !== TASK_CANCELLED) {
           throw err
@@ -137,7 +145,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
           setOrderForm(newOrderForm)
         }
 
-        return { success: true, orderForm: newOrderForm }
+        return { success: true, orderForm: newOrderForm as CheckoutOrderForm }
       } catch (error) {
         if (!error || error.code !== TASK_CANCELLED) {
           throw error
@@ -151,8 +159,8 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       canEditData,
-      countries,
-      selectedAddress,
+      countries: countries as string[],
+      selectedAddress: selectedAddress!,
       updateSelectedAddress: handleSelectAddress,
       insertAddress: handleInsertAddress,
       deliveryOptions,
