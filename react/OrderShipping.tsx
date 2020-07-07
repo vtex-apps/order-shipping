@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useCallback, useMemo } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react'
 import { useMutation } from 'react-apollo'
 import { OrderQueue, OrderForm } from 'vtex.order-manager'
 import {
@@ -30,6 +36,7 @@ interface SelectAddressResult {
 }
 
 interface Context {
+  searchedAddress: CheckoutAddress | null
   countries: string[]
   canEditData: boolean
   selectedAddress?: CheckoutAddress
@@ -49,6 +56,10 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
   const [estimateShipping] = useMutation(EstimateShippingMutation)
   const [selectDeliveryOption] = useMutation(SelectDeliveryOptionMutation)
   const [updateSelectedAddress] = useMutation(UpdateSelectedAddressMutation)
+  const [
+    searchedAddress,
+    setSearchedAddress,
+  ] = useState<CheckoutAddress | null>(null)
 
   const { enqueue, listen } = useOrderQueue()
   const { orderForm, setOrderForm } = useOrderForm()
@@ -80,6 +91,8 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
         if (queueStatusRef.current === QueueStatus.FULFILLED) {
           setOrderForm(newOrderForm)
         }
+
+        setSearchedAddress(address)
 
         return { success: true, orderForm: newOrderForm as CheckoutOrderForm }
       } catch (error) {
@@ -158,6 +171,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
 
   const contextValue = useMemo(
     () => ({
+      searchedAddress,
       canEditData,
       countries: countries as string[],
       selectedAddress: selectedAddress!,
@@ -167,6 +181,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
       selectDeliveryOption: handleSelectDeliveryOption,
     }),
     [
+      searchedAddress,
       canEditData,
       countries,
       selectedAddress,
