@@ -32,7 +32,6 @@ interface SelectDeliveryOptionResult {
 
 interface SelectAddressResult {
   success: boolean
-  orderForm?: CheckoutOrderForm
 }
 
 interface Context {
@@ -119,20 +118,26 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
         return updatedOrderForm
       }
 
-      try {
-        const newOrderForm = await enqueue(task, 'selectDeliveryOption')
+      setOrderForm(prevOrderForm => ({
+        ...prevOrderForm,
+        shipping: {
+          ...prevOrderForm.shipping,
+          deliveryOptions: prevOrderForm.shipping.deliveryOptions?.map(
+            deliveryOption => ({
+              ...deliveryOption,
+              isSelected: deliveryOption?.id === deliveryOptionId,
+            })
+          ),
+        },
+      }))
 
+      enqueue(task, 'selectDeliveryOption').then(newOrderForm => {
         if (queueStatusRef.current === QueueStatus.FULFILLED) {
           setOrderForm(newOrderForm)
         }
+      })
 
-        return { success: true, orderForm: newOrderForm as CheckoutOrderForm }
-      } catch (err) {
-        if (!err || err.code !== TASK_CANCELLED) {
-          throw err
-        }
-        return { success: false }
-      }
+      return { success: true }
     },
     [queueStatusRef, selectDeliveryOption, enqueue, setOrderForm]
   )
