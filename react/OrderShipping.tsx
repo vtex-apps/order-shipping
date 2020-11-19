@@ -11,9 +11,11 @@ import {
   OrderForm as CheckoutOrderForm,
   Address as CheckoutAddress,
   DeliveryOption,
+  PickupOption
 } from 'vtex.checkout-graphql'
 import EstimateShippingMutation from 'vtex.checkout-resources/MutationEstimateShipping'
 import SelectDeliveryOptionMutation from 'vtex.checkout-resources/MutationSelectDeliveryOption'
+import SelectPickupOptionMutation from 'vtex.checkout-resources/MutationSelectPickupOption'
 import UpdateSelectedAddressMutation from 'vtex.checkout-resources/MutationUpdateSelectedAddress'
 
 const { QueueStatus, useOrderQueue, useQueueStatus } = OrderQueue
@@ -25,7 +27,7 @@ interface InsertAddressResult {
   orderForm?: CheckoutOrderForm
 }
 
-interface SelectDeliveryOptionResult {
+interface SelectShippingOptionResult {
   success: boolean
   orderForm?: CheckoutOrderForm
 }
@@ -44,7 +46,9 @@ interface Context {
   ) => Promise<SelectAddressResult>
   insertAddress: (address: CheckoutAddress) => Promise<InsertAddressResult>
   deliveryOptions: DeliveryOption[]
-  selectDeliveryOption: (option: string) => Promise<SelectDeliveryOptionResult>
+  pickupOptions: PickupOption[]
+  selectDeliveryOption: (option: string) => Promise<SelectShippingOptionResult>
+  selectPickupOption: (option: string) => Promise<SelectShippingOptionResult>
 }
 
 const OrderShippingContext = createContext<Context | undefined>(undefined)
@@ -54,6 +58,7 @@ const TASK_CANCELLED = 'TASK_CANCELLED'
 export const OrderShippingProvider: React.FC = ({ children }) => {
   const [estimateShipping] = useMutation(EstimateShippingMutation)
   const [selectDeliveryOption] = useMutation(SelectDeliveryOptionMutation)
+  const [selectPickupOption] = useMutation(SelectPickupOptionMutation)
   const [updateSelectedAddress] = useMutation(UpdateSelectedAddressMutation)
   const [
     searchedAddress,
@@ -67,7 +72,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
 
   const {
     canEditData,
-    shipping: { countries, selectedAddress, deliveryOptions },
+    shipping: { countries, selectedAddress, deliveryOptions, pickupOptions },
   } = orderForm
 
   const handleInsertAddress = useCallback(
@@ -106,6 +111,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
 
   const handleSelectDeliveryOption = useCallback(
     async (deliveryOptionId: string) => {
+      console.log({deliveryOptionId})
       const task = async () => {
         const {
           data: { selectDeliveryOption: updatedOrderForm },
@@ -141,6 +147,41 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
     },
     [queueStatusRef, selectDeliveryOption, enqueue, setOrderForm]
   )
+
+  const handleSelectPickupOption = useCallback(async (pickupOptionId: string) => {
+    const task = async () => {
+        const {
+          data: { selectPickupOption: updatedOrderForm },
+        } = await selectPickupOption({
+          variables: {
+            pickupOptionId,
+          },
+        })
+
+        return updatedOrderForm
+      }
+
+      setOrderForm(prevOrderForm => ({
+        ...prevOrderForm,
+        shipping: {
+          ...prevOrderForm.shipping,
+          pickupOptions: prevOrderForm.shipping.pickupOptions?.map(
+            pickupOption => ({
+              ...pickupOption,
+              isSelected: pickupOption?.id === pickupOptionId,
+            })
+          )
+        },
+      }))
+
+      enqueue(task, 'selectPickupOption').then(newOrderForm => {
+        if (queueStatusRef.current === QueueStatus.FULFILLED) {
+          setOrderForm(newOrderForm)
+        }
+      })
+
+      return { success: true }
+  }, [queueStatusRef, selectPickupOption, enqueue, setOrderForm])
 
   const handleSelectAddress = useCallback(
     async (address: CheckoutAddress) => {
@@ -183,7 +224,9 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
       updateSelectedAddress: handleSelectAddress,
       insertAddress: handleInsertAddress,
       deliveryOptions: deliveryOptions as DeliveryOption[],
+      pickupOptions: pickupOptions as PickupOption[],
       selectDeliveryOption: handleSelectDeliveryOption,
+      selectPickupOption: handleSelectPickupOption,
     }),
     [
       searchedAddress,
@@ -193,7 +236,9 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
       handleSelectAddress,
       handleInsertAddress,
       deliveryOptions,
+      pickupOptions,
       handleSelectDeliveryOption,
+      handleSelectPickupOption
     ]
   )
 
