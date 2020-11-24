@@ -111,7 +111,6 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
 
   const handleSelectDeliveryOption = useCallback(
     async (deliveryOptionId: string) => {
-      console.log({deliveryOptionId})
       const task = async () => {
         const {
           data: { selectDeliveryOption: updatedOrderForm },
