@@ -1,8 +1,8 @@
-📢 Use this project, [contribute](https://github.com/{OrganizationName}/{AppName}) to it or open issues to help evolve it using [Store Discussion](https://github.com/vtex-apps/store-discussion).
+📢 Use this project, [contribute](https://github.com/vtex-apps/order-shipping) to it or open issues to help evolve it using [Store Discussion](https://github.com/vtex-apps/store-discussion).
 
-# ORDERS SHIPPING
+# Order Shipping
 
-⚠️ **This is an ongoing, unsupported, unfinished and undocumented project. We do not guarantee any results after installation.** ⚠️
+> :warning: *Although ready to be installed, the Order Shipping app is currently an **open-beta project**. Bear in mind that due to that status, you can expect an accelerated state of evolution.*
 
 <!-- DOCS-IGNORE:start -->
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
@@ -10,9 +10,7 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 <!-- DOCS-IGNORE:end -->
 
-> Centralizes all shipping related requests to the Checkout API.
-
-Any kind of shipping query or manipulation should be made through this component. This ensures that each interaction with the Checkout API happens in succession, avoiding concurrency issues.
+The Order Shipping app manages all shipping queries, ensuring that each interaction with the [Checkout API](https://developers.vtex.com/vtex-developer-docs/reference/catalog-api-overview) happens in succession i.e. with no concurrency issues. 
 
 ## Configuration 
 
@@ -81,7 +79,7 @@ selectDeliveryOption('PAC')
 
 ## Customization
 
-TBC
+🚧 To be defined.
 
 <!-- DOCS-IGNORE:start -->
 
