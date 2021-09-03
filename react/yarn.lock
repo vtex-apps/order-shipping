@@ -5384,21 +5384,25 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-"vtex.checkout-graphql@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-graphql@0.47.0/public/@types/vtex.checkout-graphql":
-  version "0.47.0"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-graphql@0.47.0/public/@types/vtex.checkout-graphql#4206974436b5fabeb23eb165628c43994ce4c1bf"
+"vtex.checkout-graphql@https://carbonfree--checkoutio.myvtex.com/_v/private/typings/linked/v1/vtex.checkout-graphql@0.61.0+build1629407583/public/@types/vtex.checkout-graphql":
+  version "0.61.0"
+  resolved "https://carbonfree--checkoutio.myvtex.com/_v/private/typings/linked/v1/vtex.checkout-graphql@0.61.0+build1629407583/public/@types/vtex.checkout-graphql#adab52ebef6c749158dc27ffd180c1170f93ff80"
 
-"vtex.checkout-resources@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-resources@0.37.0/public/@types/vtex.checkout-resources":
-  version "0.37.0"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-resources@0.37.0/public/@types/vtex.checkout-resources#391726bdab0042610913ad691b3064f70462718b"
+"vtex.checkout-resources@https://carbonfree--checkoutio.myvtex.com/_v/private/typings/linked/v1/vtex.checkout-resources@0.46.0+build1629407666/public/@types/vtex.checkout-resources":
+  version "0.46.0"
+  resolved "https://carbonfree--checkoutio.myvtex.com/_v/private/typings/linked/v1/vtex.checkout-resources@0.46.0+build1629407666/public/@types/vtex.checkout-resources#0dac9d10750a43c2e881937491dd5f92d719a883"
 
-"vtex.order-manager@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.8.7/public/@types/vtex.order-manager":
-  version "0.8.7"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.8.7/public/@types/vtex.order-manager#d666dbf9c6d630dba38ac26e815ffaa3811933df"
+"vtex.order-manager@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.11.1/public/@types/vtex.order-manager":
+  version "0.11.1"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.11.1/public/@types/vtex.order-manager#cc658148c5e054900c0d692a26d1ac7c872d9262"
 
-"vtex.render-runtime@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.125.0/public/@types/vtex.render-runtime":
-  version "8.125.0"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.125.0/public/@types/vtex.render-runtime#9cef678d3abf4e84c6aeabf266530882a3a3cfd7"
+"vtex.order-shipping@https://carbonfree--checkoutio.myvtex.com/_v/private/typings/linked/v1/vtex.order-shipping@0.7.0+build1629408429/public/@types/vtex.order-shipping":
+  version "0.7.0"
+  resolved "https://carbonfree--checkoutio.myvtex.com/_v/private/typings/linked/v1/vtex.order-shipping@0.7.0+build1629408429/public/@types/vtex.order-shipping#5d0a1cd6f6ea5c52c0bfbf13908039ca1f475384"
+
+"vtex.render-runtime@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.131.0/public/@types/vtex.render-runtime":
+  version "8.131.0"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.131.0/public/@types/vtex.render-runtime#dcc88828e3d65ecb4e7538a3623a4b1ddd77e034"
 
 w3c-hr-time@^1.0.1:
   version "1.0.1"

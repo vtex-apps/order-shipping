@@ -23,10 +23,11 @@
     "@vtex/test-tools": "^3.1.0",
     "react-intl": "^4.3.1",
     "typescript": "3.9.7",
-    "vtex.checkout-graphql": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-graphql@0.47.0/public/@types/vtex.checkout-graphql",
-    "vtex.checkout-resources": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-resources@0.37.0/public/@types/vtex.checkout-resources",
-    "vtex.order-manager": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.8.7/public/@types/vtex.order-manager",
-    "vtex.render-runtime": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.125.0/public/@types/vtex.render-runtime"
+    "vtex.checkout-graphql": "https://carbonfree--checkoutio.myvtex.com/_v/private/typings/linked/v1/vtex.checkout-graphql@0.61.0+build1629407583/public/@types/vtex.checkout-graphql",
+    "vtex.checkout-resources": "https://carbonfree--checkoutio.myvtex.com/_v/private/typings/linked/v1/vtex.checkout-resources@0.46.0+build1629407666/public/@types/vtex.checkout-resources",
+    "vtex.order-manager": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.11.1/public/@types/vtex.order-manager",
+    "vtex.order-shipping": "https://carbonfree--checkoutio.myvtex.com/_v/private/typings/linked/v1/vtex.order-shipping@0.7.0+build1629408429/public/@types/vtex.order-shipping",
+    "vtex.render-runtime": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.131.0/public/@types/vtex.render-runtime"
   },
   "version": "0.7.0"
 }

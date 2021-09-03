@@ -11,9 +11,11 @@ import {
   OrderForm as CheckoutOrderForm,
   Address as CheckoutAddress,
   DeliveryOption,
-  PickupOption
+  PickupOption,
 } from 'vtex.checkout-graphql'
 import EstimateShippingMutation from 'vtex.checkout-resources/MutationEstimateShipping'
+import EstimateCarbonFreeShippingMutation from 'vtex.checkout-resources/MutationEstimateCarbonFreeShipping'
+import ClearCarbonFreeShippingMutation from 'vtex.checkout-resources/MutationClearCarbonFreeShipping'
 import SelectDeliveryOptionMutation from 'vtex.checkout-resources/MutationSelectDeliveryOption'
 import SelectPickupOptionMutation from 'vtex.checkout-resources/MutationSelectPickupOption'
 import UpdateSelectedAddressMutation from 'vtex.checkout-resources/MutationUpdateSelectedAddress'
@@ -36,6 +38,10 @@ interface SelectAddressResult {
   success: boolean
 }
 
+interface EstimateCarbonFreeShippingResult {
+  orderForm?: CheckoutOrderForm
+}
+
 interface Context {
   searchedAddress: CheckoutAddress | null
   countries: string[]
@@ -49,6 +55,8 @@ interface Context {
   pickupOptions: PickupOption[]
   selectDeliveryOption: (option: string) => Promise<SelectShippingOptionResult>
   selectPickupOption: (option: string) => Promise<SelectShippingOptionResult>
+  estimateCarbonFreeShipping: () => Promise<EstimateCarbonFreeShippingResult>
+  clearCarbonFreeShipping: () => Promise<EstimateCarbonFreeShippingResult>
 }
 
 const OrderShippingContext = createContext<Context | undefined>(undefined)
@@ -60,6 +68,10 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
   const [selectDeliveryOption] = useMutation(SelectDeliveryOptionMutation)
   const [selectPickupOption] = useMutation(SelectPickupOptionMutation)
   const [updateSelectedAddress] = useMutation(UpdateSelectedAddressMutation)
+  const [estimateCarbonFreeShipping] = useMutation(
+    EstimateCarbonFreeShippingMutation
+  )
+  const [clearCarbonFreeShipping] = useMutation(ClearCarbonFreeShippingMutation)
   const [
     searchedAddress,
     setSearchedAddress,
@@ -109,6 +121,40 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
     [estimateShipping, enqueue, queueStatusRef, setOrderForm]
   )
 
+  const handleEstimateCarbonFreeShipping = useCallback(async () => {
+    const task = async () => {
+      const {
+        data: { estimateCarbonFreeShipping: updatedOrderForm },
+      } = await estimateCarbonFreeShipping()
+
+      return updatedOrderForm
+    }
+
+    const newOrderForm = await enqueue(task, 'estimateCarbonFreeShipping')
+    if (queueStatusRef.current === QueueStatus.FULFILLED) {
+      setOrderForm(newOrderForm)
+    }
+
+    return { orderForm: newOrderForm }
+  }, [queueStatusRef, estimateCarbonFreeShipping, enqueue, setOrderForm])
+
+  const handleClearCarbonFreeShipping = useCallback(async () => {
+    const task = async () => {
+      const {
+        data: { clearCarbonFreeShipping: updatedOrderForm },
+      } = await clearCarbonFreeShipping()
+
+      return updatedOrderForm
+    }
+
+    const newOrderForm = await enqueue(task, 'clearCarbonFreeShipping')
+    if (queueStatusRef.current === QueueStatus.FULFILLED) {
+      setOrderForm(newOrderForm)
+    }
+
+    return { orderForm: newOrderForm }
+  }, [queueStatusRef, clearCarbonFreeShipping, enqueue, setOrderForm])
+
   const handleSelectDeliveryOption = useCallback(
     async (deliveryOptionId: string) => {
       const task = async () => {
@@ -147,8 +193,9 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
     [queueStatusRef, selectDeliveryOption, enqueue, setOrderForm]
   )
 
-  const handleSelectPickupOption = useCallback(async (pickupOptionId: string) => {
-    const task = async () => {
+  const handleSelectPickupOption = useCallback(
+    async (pickupOptionId: string) => {
+      const task = async () => {
         const {
           data: { selectPickupOption: updatedOrderForm },
         } = await selectPickupOption({
@@ -169,7 +216,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
               ...pickupOption,
               isSelected: pickupOption?.id === pickupOptionId,
             })
-          )
+          ),
         },
       }))
 
@@ -180,7 +227,9 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
       })
 
       return { success: true }
-  }, [queueStatusRef, selectPickupOption, enqueue, setOrderForm])
+    },
+    [queueStatusRef, selectPickupOption, enqueue, setOrderForm]
+  )
 
   const handleSelectAddress = useCallback(
     async (address: CheckoutAddress) => {
@@ -226,6 +275,8 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
       pickupOptions: pickupOptions as PickupOption[],
       selectDeliveryOption: handleSelectDeliveryOption,
       selectPickupOption: handleSelectPickupOption,
+      estimateCarbonFreeShipping: handleEstimateCarbonFreeShipping,
+      clearCarbonFreeShipping: handleClearCarbonFreeShipping,
     }),
     [
       searchedAddress,
@@ -237,7 +288,9 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
       deliveryOptions,
       pickupOptions,
       handleSelectDeliveryOption,
-      handleSelectPickupOption
+      handleSelectPickupOption,
+      handleEstimateCarbonFreeShipping,
+      handleClearCarbonFreeShipping,
     ]
   )
 
