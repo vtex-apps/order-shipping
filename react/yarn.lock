@@ -1567,6 +1567,13 @@
   resolved "https://registry.yarnpkg.com/@types/zen-observable/-/zen-observable-0.8.0.tgz#8b63ab7f1aa5321248aad5ac890a485656dcea4d"
   integrity sha512-te5lMAWii1uEJ4FwLjzdlbw3+n0FZNOvFXHxQDKeT0dilh7HOzdMzV2TrJVUzq8ep7J4Na8OUYPRLSQkJHAlrg==
 
+"@vtex/checkout-types@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@vtex/checkout-types/-/checkout-types-0.1.2.tgz#4a137870a4b565a19bf6d998bd963a01897e2131"
+  integrity sha512-jShCJ6jbPLRiVIKukF56KuYBV/BggnsRsheJeIcHBk9+vyHgEFsfg3Afkk1WQMOPbhNHTy8wSSD7XU6LsfKbcQ==
+  dependencies:
+    react "17.0.1"
+
 "@vtex/css-handles@^1.0.0":
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/@vtex/css-handles/-/css-handles-1.1.3.tgz#30bd1010f2907443188738f74dd11d3b6b4ac624"
@@ -4496,6 +4503,14 @@ react-test-renderer@^16.12.0:
     react-is "^16.8.6"
     scheduler "^0.19.1"
 
+react@17.0.1:
+  version "17.0.1"
+  resolved "https://registry.yarnpkg.com/react/-/react-17.0.1.tgz#6e0600416bd57574e3f86d92edba3d9008726127"
+  integrity sha512-lG9c9UuMHdcAexXtigOZLX8exLWkW0Ku29qPRU8uhF2R9BN96dLCt0psvzPLlHc5OWkgymP3qwTRgbnw5BKx3w==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+
 react@^16.8.3:
   version "16.9.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.9.0.tgz#40ba2f9af13bc1a38d75dbf2f4359a5185c4f7aa"
@@ -5384,21 +5399,21 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-"vtex.checkout-graphql@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-graphql@0.47.0/public/@types/vtex.checkout-graphql":
-  version "0.47.0"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-graphql@0.47.0/public/@types/vtex.checkout-graphql#4206974436b5fabeb23eb165628c43994ce4c1bf"
+"vtex.checkout-graphql@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-graphql@0.55.1/public/@types/vtex.checkout-graphql":
+  version "0.55.1"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-graphql@0.55.1/public/@types/vtex.checkout-graphql#a9f282941d74fffac3d3d877d92313dd755de07f"
 
-"vtex.checkout-resources@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-resources@0.37.0/public/@types/vtex.checkout-resources":
-  version "0.37.0"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-resources@0.37.0/public/@types/vtex.checkout-resources#391726bdab0042610913ad691b3064f70462718b"
+"vtex.checkout-resources@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-resources@0.41.0/public/@types/vtex.checkout-resources":
+  version "0.41.0"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.checkout-resources@0.41.0/public/@types/vtex.checkout-resources#e698a48b6a3e47e2d2219725dc5f3d9ab03ed664"
 
-"vtex.order-manager@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.8.7/public/@types/vtex.order-manager":
-  version "0.8.7"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.8.7/public/@types/vtex.order-manager#d666dbf9c6d630dba38ac26e815ffaa3811933df"
+"vtex.order-manager@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.9.0/public/@types/vtex.order-manager":
+  version "0.9.0"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.order-manager@0.9.0/public/@types/vtex.order-manager#95626778e7cff8c8e70f0a3b09348937043f6d21"
 
-"vtex.render-runtime@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.125.0/public/@types/vtex.render-runtime":
-  version "8.125.0"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.125.0/public/@types/vtex.render-runtime#9cef678d3abf4e84c6aeabf266530882a3a3cfd7"
+"vtex.render-runtime@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.126.5/public/@types/vtex.render-runtime":
+  version "8.126.5"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.126.5/public/@types/vtex.render-runtime#f529e960313579c39a9748820885b995f9d6d3e6"
 
 w3c-hr-time@^1.0.1:
   version "1.0.1"

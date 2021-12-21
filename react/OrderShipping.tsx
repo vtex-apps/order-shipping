@@ -11,7 +11,7 @@ import {
   OrderForm as CheckoutOrderForm,
   Address as CheckoutAddress,
   DeliveryOption,
-  PickupOption
+  PickupOption,
 } from 'vtex.checkout-graphql'
 import EstimateShippingMutation from 'vtex.checkout-resources/MutationEstimateShipping'
 import SelectDeliveryOptionMutation from 'vtex.checkout-resources/MutationSelectDeliveryOption'
@@ -147,8 +147,9 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
     [queueStatusRef, selectDeliveryOption, enqueue, setOrderForm]
   )
 
-  const handleSelectPickupOption = useCallback(async (pickupOptionId: string) => {
-    const task = async () => {
+  const handleSelectPickupOption = useCallback(
+    async (pickupOptionId: string) => {
+      const task = async () => {
         const {
           data: { selectPickupOption: updatedOrderForm },
         } = await selectPickupOption({
@@ -169,7 +170,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
               ...pickupOption,
               isSelected: pickupOption?.id === pickupOptionId,
             })
-          )
+          ),
         },
       }))
 
@@ -180,7 +181,9 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
       })
 
       return { success: true }
-  }, [queueStatusRef, selectPickupOption, enqueue, setOrderForm])
+    },
+    [queueStatusRef, selectPickupOption, enqueue, setOrderForm]
+  )
 
   const handleSelectAddress = useCallback(
     async (address: CheckoutAddress) => {
@@ -237,7 +240,7 @@ export const OrderShippingProvider: React.FC = ({ children }) => {
       deliveryOptions,
       pickupOptions,
       handleSelectDeliveryOption,
-      handleSelectPickupOption
+      handleSelectPickupOption,
     ]
   )
 
