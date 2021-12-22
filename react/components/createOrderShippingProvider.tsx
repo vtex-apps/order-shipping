@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useMemo,
   useState,
+  FC,
 } from 'react'
 import { OrderQueueContext } from '@vtex/order-manager'
 import {
@@ -111,4 +112,202 @@ interface CreateOrderShippingProvider<O extends CheckoutOrderForm> {
   useUpdateSelectedAddress: UseUpdateSelectedAddress
 }
 
-export function createOrderShippingProvider() {}
+export function createOrderShippingProvider({
+  useLogger,
+  useOrderQueue,
+  useOrderForm,
+  useQueueStatus,
+  useEstimateShipping,
+  useSelectDeliveryOption,
+  useSelectPickupOption,
+  useUpdateSelectedAddress,
+}: CreateOrderShippingProvider<CheckoutOrderForm>) {
+  const OrderShippingProvider: FC = ({ children }) => {
+    const { enqueue, listen } = useOrderQueue()
+    const { orderForm, setOrderForm } = useOrderForm()
+    const { estimateShipping } = useEstimateShipping()
+    const { selectDeliveryOption } = useSelectDeliveryOption()
+    const { selectPickupOption } = useSelectPickupOption()
+    const { updateSelectedAddress } = useUpdateSelectedAddress()
+    const queueStatusRef = useQueueStatus(listen)
+    const {
+      canEditData,
+      shipping: { countries, selectedAddress, deliveryOptions, pickupOptions },
+    } = orderForm
+
+    const [
+      searchedAddress,
+      setSearchedAddress,
+    ] = useState<CheckoutAddress | null>(null)
+
+    const handleInsertAddress = useCallback(
+      async (address: CheckoutAddress) => {
+        const task = async () => {
+          const orderFormUpdate = await estimateShipping(address)
+
+          return orderFormUpdate
+        }
+
+        try {
+          const newOrderForm = await enqueue(task, 'insertAddress')
+
+          if (queueStatusRef.current === QueueStatus.FULFILLED) {
+            setOrderForm(newOrderForm)
+          }
+
+          setSearchedAddress(address)
+
+          return { success: true, orderForm: newOrderForm as CheckoutOrderForm }
+        } catch (error) {
+          if (!error || error.code !== TASK_CANCELLED) {
+            throw error
+          }
+          return { success: false }
+        }
+      },
+      [estimateShipping, enqueue, queueStatusRef, setOrderForm]
+    )
+
+    const handleSelectDeliveryOption = useCallback(
+      async (deliveryOptionId: string) => {
+        const task = async () => {
+          const updatedOrderForm = await selectDeliveryOption(deliveryOptionId)
+
+          return updatedOrderForm
+        }
+
+        setOrderForm(prevOrderForm => ({
+          ...prevOrderForm,
+          shipping: {
+            ...prevOrderForm.shipping,
+            deliveryOptions: prevOrderForm.shipping.deliveryOptions?.map(
+              deliveryOption => ({
+                ...deliveryOption,
+                isSelected: deliveryOption?.id === deliveryOptionId,
+              })
+            ),
+          },
+        }))
+
+        enqueue(task, 'selectDeliveryOption').then(
+          (newOrderForm: CheckoutOrderForm) => {
+            if (queueStatusRef.current === QueueStatus.FULFILLED) {
+              setOrderForm(newOrderForm)
+            }
+          }
+        )
+
+        return { success: true }
+      },
+      [queueStatusRef, selectDeliveryOption, enqueue, setOrderForm]
+    )
+
+    const handleSelectPickupOption = useCallback(
+      async (pickupOptionId: string) => {
+        const task = async () => {
+          const updatedOrderForm = await selectPickupOption(pickupOptionId)
+
+          return updatedOrderForm
+        }
+
+        setOrderForm(prevOrderForm => ({
+          ...prevOrderForm,
+          shipping: {
+            ...prevOrderForm.shipping,
+            pickupOptions: prevOrderForm.shipping.pickupOptions?.map(
+              pickupOption => ({
+                ...pickupOption,
+                isSelected: pickupOption?.id === pickupOptionId,
+              })
+            ),
+          },
+        }))
+
+        enqueue(task, 'selectPickupOption').then(
+          (newOrderForm: CheckoutOrderForm) => {
+            if (queueStatusRef.current === QueueStatus.FULFILLED) {
+              setOrderForm(newOrderForm)
+            }
+          }
+        )
+
+        return { success: true }
+      },
+      [queueStatusRef, selectPickupOption, enqueue, setOrderForm]
+    )
+
+    const handleSelectAddress = useCallback(
+      async (address: CheckoutAddress) => {
+        const task = async () => {
+          const newOrderForm = await updateSelectedAddress(address)
+
+          return newOrderForm
+        }
+
+        try {
+          const newOrderForm = await enqueue(task, 'selectAddress')
+
+          if (queueStatusRef.current === QueueStatus.FULFILLED) {
+            setOrderForm(newOrderForm)
+          }
+
+          return { success: true, orderForm: newOrderForm as CheckoutOrderForm }
+        } catch (error) {
+          if (!error || error.code !== TASK_CANCELLED) {
+            throw error
+          }
+          return { success: false }
+        }
+      },
+      [enqueue, queueStatusRef, updateSelectedAddress, setOrderForm]
+    )
+
+    const contextValue = useMemo(
+      () => ({
+        searchedAddress,
+        canEditData,
+        countries: countries as string[],
+        selectedAddress: selectedAddress!,
+        updateSelectedAddress: handleSelectAddress,
+        insertAddress: handleInsertAddress,
+        deliveryOptions: deliveryOptions as DeliveryOption[],
+        pickupOptions: pickupOptions as PickupOption[],
+        selectDeliveryOption: handleSelectDeliveryOption,
+        selectPickupOption: handleSelectPickupOption,
+      }),
+      [
+        searchedAddress,
+        canEditData,
+        countries,
+        selectedAddress,
+        handleSelectAddress,
+        handleInsertAddress,
+        deliveryOptions,
+        pickupOptions,
+        handleSelectDeliveryOption,
+        handleSelectPickupOption,
+      ]
+    )
+
+    return (
+      <OrderShippingContext.Provider value={contextValue}>
+        {children}
+      </OrderShippingContext.Provider>
+    )
+  }
+
+  return { OrderShippingProvider }
+}
+
+export const useOrderShipping = () => {
+  const context = useContext(OrderShippingContext)
+  if (context === undefined) {
+    throw new Error(
+      'useOrderShipping must be used within a OrderShippingProvider'
+    )
+  }
+
+  return context
+}
+
+export default { createOrderShippingProvider, useOrderShipping }
