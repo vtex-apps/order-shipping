@@ -129,6 +129,7 @@ export function createOrderShippingProvider({
     const { selectDeliveryOption } = useSelectDeliveryOption()
     const { selectPickupOption } = useSelectPickupOption()
     const { updateSelectedAddress } = useUpdateSelectedAddress()
+    const { log } = useLogger()
     const queueStatusRef = useQueueStatus(listen)
     const {
       canEditData,
@@ -160,13 +161,22 @@ export function createOrderShippingProvider({
 
           return { success: true, orderForm: newOrderForm as CheckoutOrderForm }
         } catch (error) {
+          log({
+            type: 'Error',
+            level: 'Critical',
+            event: {
+              error,
+              orderFormId: id,
+            },
+            workflowInstance: 'insert-address-error',
+          })
           if (!error || error.code !== TASK_CANCELLED) {
             throw error
           }
           return { success: false }
         }
       },
-      [estimateShipping, enqueue, queueStatusRef, setOrderForm, id]
+      [estimateShipping, enqueue, queueStatusRef, setOrderForm, id, log]
     )
 
     const handleSelectDeliveryOption = useCallback(
@@ -257,13 +267,22 @@ export function createOrderShippingProvider({
 
           return { success: true, orderForm: newOrderForm as CheckoutOrderForm }
         } catch (error) {
+          log({
+            type: 'Error',
+            level: 'Critical',
+            event: {
+              error,
+              orderFormId: id,
+            },
+            workflowInstance: 'selected-address-not-update',
+          })
           if (!error || error.code !== TASK_CANCELLED) {
             throw error
           }
           return { success: false }
         }
       },
-      [enqueue, queueStatusRef, updateSelectedAddress, setOrderForm, id]
+      [enqueue, queueStatusRef, updateSelectedAddress, setOrderForm, id, log]
     )
 
     const contextValue = useMemo(
