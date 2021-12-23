@@ -132,6 +132,7 @@ export function createOrderShippingProvider({
     const queueStatusRef = useQueueStatus(listen)
     const {
       canEditData,
+      id,
       shipping: { countries, selectedAddress, deliveryOptions, pickupOptions },
     } = orderForm
 
@@ -143,7 +144,7 @@ export function createOrderShippingProvider({
     const handleInsertAddress = useCallback(
       async (address: CheckoutAddress) => {
         const task = async () => {
-          const orderFormUpdate = await estimateShipping(address)
+          const orderFormUpdate = await estimateShipping(address, id)
 
           return orderFormUpdate
         }
@@ -165,13 +166,16 @@ export function createOrderShippingProvider({
           return { success: false }
         }
       },
-      [estimateShipping, enqueue, queueStatusRef, setOrderForm]
+      [estimateShipping, enqueue, queueStatusRef, setOrderForm, id]
     )
 
     const handleSelectDeliveryOption = useCallback(
       async (deliveryOptionId: string) => {
         const task = async () => {
-          const updatedOrderForm = await selectDeliveryOption(deliveryOptionId)
+          const updatedOrderForm = await selectDeliveryOption(
+            deliveryOptionId,
+            id
+          )
 
           return updatedOrderForm
         }
@@ -199,13 +203,13 @@ export function createOrderShippingProvider({
 
         return { success: true }
       },
-      [queueStatusRef, selectDeliveryOption, enqueue, setOrderForm]
+      [queueStatusRef, selectDeliveryOption, enqueue, setOrderForm, id]
     )
 
     const handleSelectPickupOption = useCallback(
       async (pickupOptionId: string) => {
         const task = async () => {
-          const updatedOrderForm = await selectPickupOption(pickupOptionId)
+          const updatedOrderForm = await selectPickupOption(pickupOptionId, id)
 
           return updatedOrderForm
         }
@@ -233,13 +237,13 @@ export function createOrderShippingProvider({
 
         return { success: true }
       },
-      [queueStatusRef, selectPickupOption, enqueue, setOrderForm]
+      [queueStatusRef, selectPickupOption, enqueue, setOrderForm, id]
     )
 
     const handleSelectAddress = useCallback(
       async (address: CheckoutAddress) => {
         const task = async () => {
-          const newOrderForm = await updateSelectedAddress(address)
+          const newOrderForm = await updateSelectedAddress(address, id)
 
           return newOrderForm
         }
@@ -259,7 +263,7 @@ export function createOrderShippingProvider({
           return { success: false }
         }
       },
-      [enqueue, queueStatusRef, updateSelectedAddress, setOrderForm]
+      [enqueue, queueStatusRef, updateSelectedAddress, setOrderForm, id]
     )
 
     const contextValue = useMemo(
