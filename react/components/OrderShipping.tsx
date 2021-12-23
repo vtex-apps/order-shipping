@@ -1,27 +1,19 @@
-import React, {
-  createContext,
-  useContext,
-  useCallback,
-  useMemo,
-  useState,
-} from 'react'
+import { useCallback } from 'react'
 import { useMutation } from 'react-apollo'
 import { OrderQueue, OrderForm } from 'vtex.order-manager'
-import {
-  OrderForm as CheckoutOrderForm,
-  Address as CheckoutAddress,
-  DeliveryOption,
-  PickupOption,
-} from '@vtex/checkout-types'
+import { Address as CheckoutAddress } from '@vtex/checkout-types'
 import EstimateShippingMutation from 'vtex.checkout-resources/MutationEstimateShipping'
 import SelectDeliveryOptionMutation from 'vtex.checkout-resources/MutationSelectDeliveryOption'
 import SelectPickupOptionMutation from 'vtex.checkout-resources/MutationSelectPickupOption'
 import UpdateSelectedAddressMutation from 'vtex.checkout-resources/MutationUpdateSelectedAddress'
 
 import { useLogger } from '../utils/logger'
-import { createOrderShippingProvider } from './createOrderShippingProvider'
+import {
+  createOrderShippingProvider,
+  useOrderShipping,
+} from './createOrderShippingProvider'
 
-const { QueueStatus, useOrderQueue, useQueueStatus } = OrderQueue
+const { useOrderQueue, useQueueStatus } = OrderQueue
 
 const { useOrderForm } = OrderForm
 
@@ -115,4 +107,4 @@ const { OrderShippingProvider } = createOrderShippingProvider({
   useUpdateSelectedAddress,
 })
 
-export { OrderShippingProvider }
+export { OrderShippingProvider, useOrderShipping }
