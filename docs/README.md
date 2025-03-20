@@ -50,7 +50,7 @@ insertAddress({
   street: 'Rua General Polidoro',
   postalCode: '22230-060',
   neighborhood: 'Botafogo',
-  geocoordinates: [],
+  geoCoordinates: [],
   complement: '',
   number: '',
   receiverName: '',
