@@ -43,3 +43,9 @@ yarn-error.log
 *.orig
 package-lock.json
 .editorconfig
+
+# SDD ephemeral artifacts (plan.md, tasks.md, analysis.md are intermediate — only spec.md is committed)
+specs/**/plan.md
+specs/**/tasks.md
+specs/**/analysis.md
+specs/**/research.md
