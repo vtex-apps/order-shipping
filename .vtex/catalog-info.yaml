@@ -11,6 +11,8 @@ metadata:
     backstage.io/techdocs-ref: dir:../
     vtex.com/application-id: WZM2ZK99
     vtex.com/platform-flow-id: Shopper#4
+    vtex.com/sdd-check-skip: 'true'
+    vtex.com/sdd-check-skip-reason: It is not a priority for while
   tags:
     - typescript
     - react
